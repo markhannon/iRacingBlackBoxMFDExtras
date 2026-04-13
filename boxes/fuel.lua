@@ -1,47 +1,58 @@
+local function DrawWindow(Title, topLeft, bottomRight)
+    local TitleFont = "fonts/eurostarblackextended.ttf"
+    local TitleColor = rgbm.from0255(221, 182, 35)
+    local BackgroundColor = rgbm.from0255(0, 0, 0, .75)
+    local TitleOffsetX = 8
+    local TitleOffsetY = 3
+    local TitleSize = 27
+    local CornerRadius = 6
+
+    ui.drawRectFilled(topLeft, bottomRight, BackgroundColor, CornerRadius)
+    ui.endPivotScale(Scale, vec2(0, topLeft.y))
+
+    ui.pushDWriteFont(TitleFont)
+    ui.setCursor(vec2((topLeft.x + TitleOffsetX) * Scale, topLeft.y + (TitleOffsetY * Scale)))
+    ui.dwriteText(Title, TitleSize * Scale, TitleColor)
+    ui.popDWriteFont()
+end
+
+local function DrawItem(Text, x, y)
+    local ItemFont = "Arial;Weight=Bold"
+    local LabelColor = rgbm.from0255(221, 182, 35)
+    local ValueColor = rgbm.from0255(244, 244, 244)
+    local FontSize = 17
+    local WindowOffsetY = 22
+    local RowHeight = 30
+    local LabelWidth = 214 + 24 + 9
+    local ValueWidth = 100
+    local IsValue = x >= 260
+
+    local Alignment = IsValue and ui.Alignment.Start or ui.Alignment.End
+    local Color = IsValue and ValueColor or LabelColor
+    local Width = IsValue and ValueWidth or LabelWidth
+
+    ui.pushDWriteFont(ItemFont)
+    ui.setCursor(vec2(x * Scale, y * Scale + WindowOffsetY))
+    ui.dwriteTextAligned(tostring(Text), FontSize * Scale, Alignment, ui.Alignment.Start, vec2(Width, RowHeight):scale(Scale), false, Color)
+    ui.popDWriteFont()
+end
+
 function FuelBlackBox()
     ui.beginScale()
 
     DrawArrows()
+    DrawWindow("Fuel", vec2(33, 22), vec2(479, 323))
 
-    -- background
-    ui.drawRectFilled(vec2(33, 22), vec2(479, 323), rgbm.from0255(0, 0, 0, .75), 6)
-
-    ui.endPivotScale(Scale, vec2(0, 22))
-
-    ui.pushDWriteFont("fonts/eurostarblackextended.ttf")
-
-    -- title
-    ui.setCursor(vec2(41 * Scale, 22 + (3 * Scale)))
-    ui.dwriteText("Fuel", 27 * Scale, rgbm.from0255(221, 182, 35))
-
-    ui.popDWriteFont()
-
-    ui.pushDWriteFont("Arial;Weight=Bold")
-
-
-
-
-    -- Remaining
-    ui.setCursor(vec2(0, 174 * Scale + 22))
-    ui.dwriteTextAligned("Remaining:", 17 * Scale, ui.Alignment.End, ui.Alignment.Start, vec2(214 + 24 + 9, 30):scale(Scale), false, rgbm.from0255(221, 182, 35))
-
-    ui.setCursor(vec2(260 * Scale, 174 * Scale + 22))
-    ui.dwriteTextAligned(string.format("%.1f", math.round(CAR.fuel, 1)) .. " L", 17 * Scale, ui.Alignment.Start, ui.Alignment.Start, vec2(100, 30):scale(Scale), false, rgbm.from0255(244, 244, 244))
-
-
-
-    -- Est Lap
-    ui.setCursor(vec2(0, (174 + 27) * Scale + 22))
-    ui.dwriteTextAligned("Est. Laps:", 17 * Scale, ui.Alignment.End, ui.Alignment.Start, vec2(214 + 24 + 9, 30):scale(Scale), false, rgbm.from0255(221, 182, 35))
-
-    ui.setCursor(vec2(260 * Scale, (174 + 27) * Scale + 22))
-    local text
-    if CAR.fuelPerLap == 0 then
-        text = "-"
-    else
-        text = math.round(CAR.fuel / CAR.fuelPerLap, 1)
+    
+    local estimatedLaps = "-"
+    if CAR.fuelPerLap ~= 0 then
+        estimatedLaps = tostring(math.round(CAR.fuel / CAR.fuelPerLap, 1))
     end
-    ui.dwriteTextAligned(text, 17 * Scale, ui.Alignment.Start, ui.Alignment.Start, vec2(100, 30):scale(Scale), false, rgbm.from0255(244, 244, 244))
-
-    ui.popDWriteFont()
+    
+    DrawItem("Fuel / Lap:", 0, 100)
+    DrawItem(CAR.fuelPerLap, 260, 100)
+    DrawItem("Est. Laps:", 0, 130)
+    DrawItem(estimatedLaps, 260, 130)
+    DrawItem("Remaining:", 0, 174)
+    DrawItem(string.format("%.1f", math.round(CAR.fuel, 1)) .. " L", 260, 174)
 end

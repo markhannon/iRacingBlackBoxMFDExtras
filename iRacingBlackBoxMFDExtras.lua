@@ -1,5 +1,5 @@
 require("boxes.globalData")
-require("settings.iRacingBlackBoxMFDSettings")
+require("settings.iRacingBlackBoxMFDExtrasSettings")
 require("boxes.lapTiming")
 require("boxes.standings")
 require("boxes.relative")

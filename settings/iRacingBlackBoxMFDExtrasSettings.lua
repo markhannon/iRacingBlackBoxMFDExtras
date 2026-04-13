@@ -1,7 +1,7 @@
 SCALE = ac.storage("Scale", 1)
 Scale = SCALE:get()
 
-IniFile = ac.INIConfig.load(ac.getFolder(ac.FolderID.ACApps) .. "\\lua\\iRacingBlackBoxMFD\\manifest.ini")
+IniFile = ac.INIConfig.load(ac.getFolder(ac.FolderID.ACApps) .. "\\lua\\iRacingBlackBoxMFDExtras\\manifest.ini")
 
 BaseWindowWidth = 447 + 2 * (24 + 9)
 BaseWindowHeight = 301 + 22
@@ -61,8 +61,8 @@ BindingNames = {
 }
 
 
-function script.iRacingBlackBoxMFD_Settings(dt)
-  ui.tabBar('iRacingBlackBoxMFDSettings', ui.TabBarFlags.NoTooltip and ui.TabBarFlags.FittingPolicyResizeDown, function()
+function script.iRacingBlackBoxMFDExtras_Settings(dt)
+  ui.tabBar('iRacingBlackBoxMFDExtrasSettings', ui.TabBarFlags.NoTooltip and ui.TabBarFlags.FittingPolicyResizeDown, function()
     ui.tabItem('General', function()
       ui.newLine(1)
 
