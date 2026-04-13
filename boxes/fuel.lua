@@ -16,7 +16,7 @@ local function DrawWindow(Title, topLeft, bottomRight)
     ui.popDWriteFont()
 end
 
-local function DrawItem(Text, x, y)
+local function DrawItem(Text, x, y, IsValue)
     local ItemFont = "Arial;Weight=Bold"
     local LabelColor = rgbm.from0255(221, 182, 35)
     local ValueColor = rgbm.from0255(244, 244, 244)
@@ -25,7 +25,6 @@ local function DrawItem(Text, x, y)
     local RowHeight = 30
     local LabelWidth = 214 + 24 + 9
     local ValueWidth = 100
-    local IsValue = x >= 260
 
     local Alignment = IsValue and ui.Alignment.Start or ui.Alignment.End
     local Color = IsValue and ValueColor or LabelColor
@@ -35,6 +34,14 @@ local function DrawItem(Text, x, y)
     ui.setCursor(vec2(x * Scale, y * Scale + WindowOffsetY))
     ui.dwriteTextAligned(tostring(Text), FontSize * Scale, Alignment, ui.Alignment.Start, vec2(Width, RowHeight):scale(Scale), false, Color)
     ui.popDWriteFont()
+end
+
+local function DrawLabel(Text, x, y)
+    DrawItem(Text, x, y, false)
+end
+
+local function DrawValue(Text, x, y)
+    DrawItem(Text, x, y, true)
 end
 
 function FuelBlackBox()
@@ -49,10 +56,10 @@ function FuelBlackBox()
         estimatedLaps = tostring(math.round(CAR.fuel / CAR.fuelPerLap, 1))
     end
     
-    DrawItem("Fuel / Lap:", 0, 100)
-    DrawItem(CAR.fuelPerLap, 260, 100)
-    DrawItem("Est. Laps:", 0, 130)
-    DrawItem(estimatedLaps, 260, 130)
-    DrawItem("Remaining:", 0, 174)
-    DrawItem(string.format("%.1f", math.round(CAR.fuel, 1)) .. " L", 260, 174)
+    DrawLabel("Fuel / Lap:", 0, 100)
+    DrawValue(CAR.fuelPerLap, 260, 100)
+    DrawLabel("Est. Laps:", 0, 130)
+    DrawValue(estimatedLaps, 260, 130)
+    DrawLabel("Remaining:", 0, 174)
+    DrawValue(string.format("%.1f", math.round(CAR.fuel, 1)) .. " L", 260, 174)
 end
