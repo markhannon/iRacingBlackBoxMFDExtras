@@ -4,19 +4,7 @@ function StandingsBlackBox()
     ui.beginScale()
 
     DrawArrows()
-
-    -- background
-    ui.drawRectFilled(vec2(33, 87), vec2(479, 323), rgbm.from0255(0, 0, 0, .75), 6)
-
-    ui.endPivotScale(Scale, vec2(0, 22))
-
-    ui.pushDWriteFont("fonts/eurostarblackextended.ttf")
-
-    -- title
-    ui.setCursor(vec2(41 * Scale, 22 + (68 * Scale)))
-    ui.dwriteText("Standings", 27 * Scale, rgbm.from0255(221, 182, 35))
-
-    ui.popDWriteFont()
+    DrawWindow("Standings", vec2(33, 87), vec2(479, 323))
 
     ui.pushDWriteFont("Arial;Weight=Bold")
 
@@ -112,21 +100,18 @@ function StandingsBlackBox()
     end
 
     -- Lap
-    ui.setCursor(vec2((24 + 9 + 9) * Scale, (209 + 65 - 5) * Scale + 22))
-    ui.dwriteTextAligned("Lap:", 17 * Scale, ui.Alignment.Start, ui.Alignment.Start, vec2(50, 30):scale(Scale), false, rgbm.from0255(221, 182, 35))
+    local summaryColor = rgbm.from0255(244, 244, 244)
+    DrawLabel("Lap:", 24 + 9 + 9, 209 + 65 - 5, 50, nil, ui.Alignment.Start)
 
-    ui.setCursor(vec2((55 + 24 + 9) * Scale, (209 + 65 - 5) * Scale + 22))
-    local text = CAR.lapCount + 1
+    local text = tostring(CAR.lapCount + 1)
     if SESSION.type == ac.SessionType.Race then
         text = tostring(CAR.lapCount + 1) .. " / " .. SESSION.laps
     end
-    ui.dwriteTextAligned(text, 17 * Scale, ui.Alignment.Start, ui.Alignment.Start, vec2(32 + 24 + 9 + 32, 30):scale(Scale), false, color)
+    DrawValue(text, 55 + 24 + 9, 209 + 65 - 5, 32 + 24 + 9 + 32, summaryColor, ui.Alignment.Start)
 
     -- Last
-    ui.setCursor(vec2((290 + 24 + 9) * Scale, (209 + 65 - 5) * Scale + 22))
-    ui.dwriteTextAligned("Last:", 17 * Scale, ui.Alignment.Start, ui.Alignment.Start, vec2(50, 30):scale(Scale), false, rgbm.from0255(221, 182, 35))
+    DrawLabel("Last:", 290 + 24 + 9, 209 + 65 - 5, 50, nil, ui.Alignment.Start)
 
-    ui.setCursor(vec2(0 * Scale, (209 + 65 - 5) * Scale + 22))
     if CAR.previousLapTimeMs == 0 then
         text = "---"
     else
@@ -136,7 +121,7 @@ function StandingsBlackBox()
         text = string.format("%d:%02d.%03d", minutes, seconds, milliseconds)
         if not CAR.isLastLapValid then text = "*" .. text end
     end
-    ui.dwriteTextAligned(text, 17 * Scale, ui.Alignment.End, ui.Alignment.Start, vec2(437 + 24 + 9, 30):scale(Scale), false, rgbm.from0255(244, 244, 244))
+    DrawValue(text, 0, 209 + 65 - 5, 437 + 24 + 9, summaryColor, ui.Alignment.End)
 
     ui.popDWriteFont()
 end

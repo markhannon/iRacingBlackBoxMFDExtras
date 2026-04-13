@@ -2,24 +2,12 @@ function LapTimingBlackBox()
     ui.beginScale()
 
     DrawArrows()
-
-    -- background
-    ui.drawRectFilled(vec2(33, 22 + 50), vec2(479, 323), rgbm.from0255(0, 0, 0, .75), 6)
-
-    ui.endPivotScale(Scale, vec2(0, 22))
-
-    ui.pushDWriteFont("fonts/eurostarblackextended.ttf")
+    DrawWindow("Lap Timing", vec2(33, 72), vec2(479, 323))
 
     local minutes
     local seconds
     local milliseconds
     local timeText
-
-    -- title
-    ui.setCursor(vec2(41 * Scale, 22 + ((3 + 50) * Scale)))
-    ui.dwriteText("Lap Timing", 27 * Scale, rgbm.from0255(221, 182, 35))
-
-    ui.popDWriteFont()
 
     -- day + time
     ui.pushDWriteFont("Arial;Weight=Bold")

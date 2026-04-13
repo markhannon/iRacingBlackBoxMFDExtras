@@ -1,4 +1,5 @@
 require("boxes.globalData")
+require("helpers")
 require("settings.iRacingBlackBoxMFDExtrasSettings")
 require("boxes.lapTiming")
 require("boxes.standings")
@@ -17,7 +18,7 @@ SelectOffsetX = 0
 FirstSetup = false
 TIME = 0
 
-local currentBlackBox = 7
+currentBlackBox = 7
 
 if ac.onSessionStart then
     ac.onSessionStart(function()
@@ -170,37 +171,4 @@ function CheckButtonInput()
     end
 end
 
-function DrawArrows()
-    local mousePos = ui.mouseLocalPos()
 
-    local leftArrColor = rgbm.from0255(0, 0, 0, .3)
-    if mousePos.x >= 0 and mousePos.x <= 24 * Scale and mousePos.y >= 160 * Scale and mousePos.y <= 314 * Scale then
-        leftArrColor = rgbm.from0255(221, 182, 35)
-
-        if ui.mouseDown(ui.MouseButton.Left) then
-            leftArrColor = rgbm.colors.white
-        end
-        if ui.mouseReleased(ui.MouseButton.Left) then
-            currentBlackBox = currentBlackBox - 1
-            if currentBlackBox == 6 then currentBlackBox = 14 end
-        end
-    end
-
-    local rightArrColor = rgbm.from0255(0, 0, 0, .3)
-    if mousePos.x >= 489 * Scale and mousePos.x <= 513 * Scale and mousePos.y >= 160 * Scale and mousePos.y <= 314 * Scale then
-        rightArrColor = rgbm.from0255(221, 182, 35)
-
-        if ui.mouseDown(ui.MouseButton.Left) then
-            rightArrColor = rgbm.colors.white
-        end
-        if ui.mouseReleased(ui.MouseButton.Left) then
-            currentBlackBox = currentBlackBox + 1
-            if currentBlackBox == 15 then currentBlackBox = 7 end
-        end
-    end
-
-    -- left arrow
-    ui.drawTriangleFilled(vec2(0, 237), vec2(24, 160), vec2(24, 314), leftArrColor)
-    -- right arrow
-    ui.drawTriangleFilled(vec2(513, 237), vec2(489, 160), vec2(489, 314), rightArrColor)
-end
