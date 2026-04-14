@@ -22,3 +22,6 @@
 
 ## Diagnostics
 - Some CSP Lua editor diagnostics around ui drawing calls are known type-stub noise and are not automatically runtime issues.
+
+## Tooling notes
+- Check `.github/tool-availability-notes.md` for known local tool limitations (for example missing `rg`) and preferred fallbacks.
