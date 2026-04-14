@@ -101,10 +101,10 @@ local function ApplyFuelAdjustments()
     FuelLapBuffer = tonumber(FuelLapBuffer) or 1
 
     if SelectOffsetY == "-" then
-        SelectOffsetY = 0
+        SelectOffsetY = 1
     end
 
-    SelectOffsetY = Clamp(SelectOffsetY, 0, 1)
+    SelectOffsetY = Clamp(SelectOffsetY, 1, 1)
 
     if SelectOffsetX == 0 then
         return
@@ -161,7 +161,7 @@ function FuelBlackBox()
         remainingFuelText = string.format("%.1f / %.1f L", math.round(CAR.fuel, 1), math.round(CAR.maxFuel, 1))
     end
 
-    DrawEditableFuelRow("Add Next Pit:", string.format("%.1f L", FuelPitAddLitres), 60, SelectOffsetY == 0)
+    -- DrawEditableFuelRow("Add Next Pit:", string.format("%.1f L", FuelPitAddLitres), 60, SelectOffsetY == 0)
     DrawEditableFuelRow("Margin (Laps):", string.format("%.1f", FuelLapBuffer), 86, SelectOffsetY == 1)
 
     DrawLabel("Estimated Next Pit:", 0, 112)
