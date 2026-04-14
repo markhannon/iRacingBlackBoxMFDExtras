@@ -8,6 +8,7 @@ function LapTimingBlackBox()
     local seconds
     local milliseconds
     local timeText
+    local showDriverNumber = ShowDriverNumber == true
 
     -- day + time
     ui.pushDWriteFont("Arial;Weight=Bold")
@@ -143,17 +144,22 @@ function LapTimingBlackBox()
     ui.setCursor(vec2(43 * Scale, (217 * Scale) + 22))
     ui.dwriteTextAligned("Ahead:", 17 * Scale, ui.Alignment.Start, ui.Alignment.Start, vec2(60, 30):scale(Scale), false, rgbm.from0255(221, 182, 35))
 
-    -- Ahead #
-    ui.setCursor(vec2(121 * Scale, (217 * Scale) + 22))
-    ui.dwriteTextAligned("#", 17 * Scale, ui.Alignment.Start, ui.Alignment.Start, vec2(200, 30):scale(Scale), false, rgbm.from0255(244, 244, 244))
+    local aheadDriverNumber = driverIndex ~= -1 and DriverData[driverIndex].driverNumber or "-"
+    local aheadDriverName = driverIndex ~= -1 and DriverData[driverIndex].driverName or "---"
 
-    -- Ahead Number
-    ui.setCursor(vec2(0, (217 * Scale) + 22))
-    ui.dwriteTextAligned(DriverData[driverIndex].driverNumber, 17 * Scale, ui.Alignment.End, ui.Alignment.Start, vec2(160, 30):scale(Scale), false, rgbm.from0255(244, 244, 244))
+    if showDriverNumber then
+        -- Ahead #
+        ui.setCursor(vec2(121 * Scale, (217 * Scale) + 22))
+        ui.dwriteTextAligned("#", 17 * Scale, ui.Alignment.Start, ui.Alignment.Start, vec2(200, 30):scale(Scale), false, rgbm.from0255(244, 244, 244))
+
+        -- Ahead Number
+        ui.setCursor(vec2(0, (217 * Scale) + 22))
+        ui.dwriteTextAligned(aheadDriverNumber, 17 * Scale, ui.Alignment.End, ui.Alignment.Start, vec2(160, 30):scale(Scale), false, rgbm.from0255(244, 244, 244))
+    end
 
     -- Ahead name
-    ui.setCursor(vec2(168 * Scale, (217 * Scale) + 22))
-    ui.dwriteTextAligned(DriverData[driverIndex].driverName, 17 * Scale, ui.Alignment.Start, ui.Alignment.Start, vec2(300, 30):scale(Scale), false, rgbm.from0255(244, 244, 244))
+    ui.setCursor(vec2((showDriverNumber and 168 or 121) * Scale, (217 * Scale) + 22))
+    ui.dwriteTextAligned(aheadDriverName, 17 * Scale, ui.Alignment.Start, ui.Alignment.Start, vec2(300, 30):scale(Scale), false, rgbm.from0255(244, 244, 244))
 
     -- Ahead interval
     ui.setCursor(vec2(0, (217 * Scale) + 22))
@@ -193,17 +199,22 @@ function LapTimingBlackBox()
     ui.setCursor(vec2(43 * Scale, (243 * Scale) + 22))
     ui.dwriteTextAligned("Behind:", 17 * Scale, ui.Alignment.Start, ui.Alignment.Start, vec2(60, 30):scale(Scale), false, rgbm.from0255(221, 182, 35))
 
-    -- Behind #
-    ui.setCursor(vec2(121 * Scale, (243 * Scale) + 22))
-    ui.dwriteTextAligned("#", 17 * Scale, ui.Alignment.Start, ui.Alignment.Start, vec2(200, 30):scale(Scale), false, rgbm.from0255(244, 244, 244))
+    local behindDriverNumber = driverIndex ~= -1 and DriverData[driverIndex].driverNumber or "-"
+    local behindDriverName = driverIndex ~= -1 and DriverData[driverIndex].driverName or "---"
 
-    -- Behind Number
-    ui.setCursor(vec2(0, (243 * Scale) + 22))
-    ui.dwriteTextAligned(DriverData[driverIndex].driverNumber, 17 * Scale, ui.Alignment.End, ui.Alignment.Start, vec2(160, 30):scale(Scale), false, rgbm.from0255(244, 244, 244))
+    if showDriverNumber then
+        -- Behind #
+        ui.setCursor(vec2(121 * Scale, (243 * Scale) + 22))
+        ui.dwriteTextAligned("#", 17 * Scale, ui.Alignment.Start, ui.Alignment.Start, vec2(200, 30):scale(Scale), false, rgbm.from0255(244, 244, 244))
+
+        -- Behind Number
+        ui.setCursor(vec2(0, (243 * Scale) + 22))
+        ui.dwriteTextAligned(behindDriverNumber, 17 * Scale, ui.Alignment.End, ui.Alignment.Start, vec2(160, 30):scale(Scale), false, rgbm.from0255(244, 244, 244))
+    end
 
     -- Behind name
-    ui.setCursor(vec2(168 * Scale, (243 * Scale) + 22))
-    ui.dwriteTextAligned(DriverData[driverIndex].driverName, 17 * Scale, ui.Alignment.Start, ui.Alignment.Start, vec2(300, 30):scale(Scale), false, rgbm.from0255(244, 244, 244))
+    ui.setCursor(vec2((showDriverNumber and 168 or 121) * Scale, (243 * Scale) + 22))
+    ui.dwriteTextAligned(behindDriverName, 17 * Scale, ui.Alignment.Start, ui.Alignment.Start, vec2(300, 30):scale(Scale), false, rgbm.from0255(244, 244, 244))
 
     -- Behind interval
     ui.setCursor(vec2(0, (243 * Scale) + 22))

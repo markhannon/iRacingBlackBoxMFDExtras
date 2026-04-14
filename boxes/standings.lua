@@ -37,6 +37,8 @@ function StandingsBlackBox()
     endPos = endPos + SelectOffsetY
 
     local lineY = 45 + 65 - 7
+    local showDriverNumber = ShowDriverNumber == true
+    local driverNameX = (showDriverNumber and 109 or 51) + 24 + 9
     if connectedCount <= 1 then
         lineY = lineY + 23 * 3
     end
@@ -50,42 +52,44 @@ function StandingsBlackBox()
         local driverIndex = GetDriverIndexForPosition(currPos)
         if driverIndex ~= -1 then
             ui.setCursor(vec2(0, lineY * Scale + 22))
-        ui.dwriteTextAligned(DriverData[driverIndex].position, 17 * Scale, ui.Alignment.End, ui.Alignment.Start, vec2(32 + 24 + 9, 30):scale(Scale), false, color)
+            ui.dwriteTextAligned(DriverData[driverIndex].position, 17 * Scale, ui.Alignment.End, ui.Alignment.Start, vec2(32 + 24 + 9, 30):scale(Scale), false, color)
 
-        ui.setCursor(vec2(0, lineY * Scale + 22))
-        ui.dwriteTextAligned("#", 17 * Scale, ui.Alignment.End, ui.Alignment.Start, vec2(32 + 24 + 9 + 32, 30):scale(Scale), false, color)
+            if showDriverNumber then
+                ui.setCursor(vec2(0, lineY * Scale + 22))
+                ui.dwriteTextAligned("#", 17 * Scale, ui.Alignment.End, ui.Alignment.Start, vec2(32 + 24 + 9 + 32, 30):scale(Scale), false, color)
 
-        ui.setCursor(vec2(0, lineY * Scale + 22))
-        ui.dwriteTextAligned(DriverData[driverIndex].driverNumber, 17 * Scale, ui.Alignment.End, ui.Alignment.Start, vec2(32 + 24 + 9 + 32 + 26, 30):scale(Scale), false, color)
+                ui.setCursor(vec2(0, lineY * Scale + 22))
+                ui.dwriteTextAligned(DriverData[driverIndex].driverNumber, 17 * Scale, ui.Alignment.End, ui.Alignment.Start, vec2(32 + 24 + 9 + 32 + 26, 30):scale(Scale), false, color)
+            end
 
-        ui.setCursor(vec2((109 + 24 + 9) * Scale, lineY * Scale + 22))
-        ui.dwriteTextAligned(DriverData[driverIndex].driverName, 17 * Scale, ui.Alignment.Start, ui.Alignment.Start, vec2(300, 30):scale(Scale), false, color)
+            ui.setCursor(vec2(driverNameX * Scale, lineY * Scale + 22))
+            ui.dwriteTextAligned(DriverData[driverIndex].driverName, 17 * Scale, ui.Alignment.Start, ui.Alignment.Start, vec2(300, 30):scale(Scale), false, color)
 
-        ui.setCursor(vec2(0, lineY * Scale + 22))
-        local timeText
-        if SESSION.type == ac.SessionType.Race then
-            if DriverData[driverIndex].position == 1 then
-                timeText = "---"
-            else
-                local ownTime = DriverSpline[driverIndex][ac.getCar(driverIndex).lapCount + 1][DriverSpline[driverIndex][ac.getCar(driverIndex).lapCount + 1].currentSpline - 1]
-                local firstTime = DriverSpline[firstIndex][ac.getCar(driverIndex).lapCount + 1][DriverSpline[driverIndex][ac.getCar(driverIndex).lapCount + 1].currentSpline - 1]
-                if ownTime == nil or firstTime == nil then
+            ui.setCursor(vec2(0, lineY * Scale + 22))
+            local timeText
+            if SESSION.type == ac.SessionType.Race then
+                if DriverData[driverIndex].position == 1 then
                     timeText = "---"
                 else
-                    local seconds = math.round(firstTime - ownTime, 1)
-                    timeText = string.format("%.1f", seconds)
+                    local ownTime = DriverSpline[driverIndex][ac.getCar(driverIndex).lapCount + 1][DriverSpline[driverIndex][ac.getCar(driverIndex).lapCount + 1].currentSpline - 1]
+                    local firstTime = DriverSpline[firstIndex][ac.getCar(driverIndex).lapCount + 1][DriverSpline[driverIndex][ac.getCar(driverIndex).lapCount + 1].currentSpline - 1]
+                    if ownTime == nil or firstTime == nil then
+                        timeText = "---"
+                    else
+                        local seconds = math.round(firstTime - ownTime, 1)
+                        timeText = string.format("%.1f", seconds)
+                    end
+                end
+            else
+                if DriverData[driverIndex].bestLap == 0 then
+                    timeText = "---"
+                else
+                    local minutes = DriverData[driverIndex].bestLap / 60E3
+                    local seconds = (minutes % 1) * 60
+                    local milliseconds = math.round((seconds % 1) * 1000)
+                    timeText = string.format("%d:%02d.%03d", minutes, seconds, milliseconds)
                 end
             end
-        else
-            if DriverData[driverIndex].bestLap == 0 then
-                timeText = "---"
-            else
-                local minutes = DriverData[driverIndex].bestLap / 60E3
-                local seconds = (minutes % 1) * 60
-                local milliseconds = math.round((seconds % 1) * 1000)
-                timeText = string.format("%d:%02d.%03d", minutes, seconds, milliseconds)
-            end
-        end
             ui.dwriteTextAligned(timeText, 17 * Scale, ui.Alignment.End, ui.Alignment.Start, vec2(437 + 24 + 9, 30):scale(Scale), false, color)
         end
 

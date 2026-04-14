@@ -58,6 +58,8 @@ function RelativeBlackBox()
 
     -- draw names
     local lineY = 38 + 71
+    local showDriverNumber = ShowDriverNumber == true
+    local driverNameX = (showDriverNumber and 109 or 51) + 24 + 9
     for i = 1, #realIndex do
         local color = rgbm.from0255(244, 244, 244)
 
@@ -76,13 +78,15 @@ function RelativeBlackBox()
         ui.setCursor(vec2(0, lineY * Scale + 22))
         ui.dwriteTextAligned(DriverData[realIndex[i]].position, 17 * Scale, ui.Alignment.End, ui.Alignment.Start, vec2(32 + 24 + 9, 30):scale(Scale), false, color)
 
-        ui.setCursor(vec2(0, lineY * Scale + 22))
-        ui.dwriteTextAligned("#", 17 * Scale, ui.Alignment.End, ui.Alignment.Start, vec2(32 + 24 + 9 + 32, 30):scale(Scale), false, color)
+        if showDriverNumber then
+            ui.setCursor(vec2(0, lineY * Scale + 22))
+            ui.dwriteTextAligned("#", 17 * Scale, ui.Alignment.End, ui.Alignment.Start, vec2(32 + 24 + 9 + 32, 30):scale(Scale), false, color)
 
-        ui.setCursor(vec2(0, lineY * Scale + 22))
-        ui.dwriteTextAligned(DriverData[realIndex[i]].driverNumber, 17 * Scale, ui.Alignment.End, ui.Alignment.Start, vec2(32 + 24 + 9 + 32 + 26, 30):scale(Scale), false, color)
+            ui.setCursor(vec2(0, lineY * Scale + 22))
+            ui.dwriteTextAligned(DriverData[realIndex[i]].driverNumber, 17 * Scale, ui.Alignment.End, ui.Alignment.Start, vec2(32 + 24 + 9 + 32 + 26, 30):scale(Scale), false, color)
+        end
 
-        ui.setCursor(vec2((109 + 24 + 9) * Scale, lineY * Scale + 22))
+        ui.setCursor(vec2(driverNameX * Scale, lineY * Scale + 22))
         ui.dwriteTextAligned(DriverData[realIndex[i]].driverName, 17 * Scale, ui.Alignment.Start, ui.Alignment.Start, vec2(300, 30):scale(Scale), false, color)
 
         ui.setCursor(vec2(0, lineY * Scale + 22))
