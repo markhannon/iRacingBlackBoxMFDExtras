@@ -1,5 +1,5 @@
-require("data")
-require("ui")
+require("lib.data")
+require("lib.ui")
 require("settings.iRacingBlackBoxMFDExtrasSettings")
 require("boxes.lapTiming")
 require("boxes.standings")
