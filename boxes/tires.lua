@@ -17,6 +17,5 @@ function TiresBlackBox()
     end
 
     -- Compound
-    DrawLabel("Compound:", 0, 188)
-    DrawValue(CAR:tyresName(), 245 + 24 + 9, 188)
+    DrawDisplayedValue("Compound:", CAR:tyresName(), 0, 245 + 24 + 9, 188)
 end

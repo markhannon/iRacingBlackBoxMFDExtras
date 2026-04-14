@@ -2,99 +2,6 @@ local function Clamp(value, minValue, maxValue)
     return math.max(minValue, math.min(maxValue, value))
 end
 
-local function GetAverageFuelPerLap()
-    if FuelAverageUsagePerLap ~= nil and FuelAverageUsagePerLap > 0 then
-        return FuelAverageUsagePerLap
-    end
-
-    if CAR.fuelPerLap ~= nil and CAR.fuelPerLap > 0 then
-        return CAR.fuelPerLap
-    end
-
-    return 0
-end
-
-local function GetReferenceLapTimeMs()
-    if CAR.previousLapTimeMs ~= nil and CAR.previousLapTimeMs > 0 then
-        return CAR.previousLapTimeMs
-    end
-
-    if DriverData[CAR.index] ~= nil and DriverData[CAR.index].bestLap ~= nil and DriverData[CAR.index].bestLap > 0 then
-        return DriverData[CAR.index].bestLap
-    end
-
-    if CAR.lapTimeMs ~= nil and CAR.lapTimeMs > 0 then
-        return CAR.lapTimeMs
-    end
-
-    return 0
-end
-
-local function GetEstimatedLapsRemaining(averageFuelPerLap)
-    if averageFuelPerLap <= 0 then
-        return nil, "-"
-    end
-
-    local estimatedLaps = math.round(CAR.fuel / averageFuelPerLap, 1)
-    return estimatedLaps, string.format("%.1f", estimatedLaps)
-end
-
-local function GetEstimatedTimeText(estimatedLaps)
-    if estimatedLaps == nil then
-        return "-"
-    end
-
-    local referenceLapTimeMs = GetReferenceLapTimeMs()
-    if referenceLapTimeMs <= 0 then
-        return "-"
-    end
-
-    local estimatedTimeMs = estimatedLaps * referenceLapTimeMs
-    local minutes = math.floor(estimatedTimeMs / 60000)
-    local seconds = math.floor((estimatedTimeMs % 60000) / 1000)
-    return string.format("%d:%02d", minutes, seconds)
-end
-
-local function GetFuelToEnd(averageFuelPerLap)
-    if averageFuelPerLap <= 0 then
-        return nil, nil
-    end
-
-    local remainingLaps = nil
-    local marginFuel = 0
-    local isTimedSession = SESSION.isTimedRace or SIM.isTimedRace or SESSION.type ~= ac.SessionType.Race
-
-    if not isTimedSession and SESSION.laps ~= nil and SESSION.laps > 0 then
-        remainingLaps = math.max(0, SESSION.laps - CAR.lapCount) + FuelLapBuffer
-    else
-        local referenceLapTimeMs = GetReferenceLapTimeMs()
-        if referenceLapTimeMs > 0 and SIM.sessionTimeLeft > 0 then
-            remainingLaps = math.ceil(SIM.sessionTimeLeft / referenceLapTimeMs)
-            marginFuel = averageFuelPerLap * FuelLapBuffer
-        end
-    end
-
-    if remainingLaps == nil then
-        return nil, nil
-    end
-
-    local fuelToEnd = math.max(0, remainingLaps * averageFuelPerLap + marginFuel - CAR.fuel)
-
-    return remainingLaps, fuelToEnd
-end
-
-local function GetFillNextPit(fuelToEnd)
-    if fuelToEnd == nil then
-        return "N/A"
-    end
-
-    if CAR.maxFuel ~= nil and CAR.maxFuel > 0 then
-        local headroom = math.max(0, CAR.maxFuel - CAR.fuel)
-        return string.format("%.1f L", math.round(math.min(fuelToEnd, headroom), 1))
-    end
-
-    return "N/A"
-end
 
 local function ApplyFuelAdjustments()
     FuelPitAddLitres = tonumber(FuelPitAddLitres) or 0
@@ -119,21 +26,6 @@ local function ApplyFuelAdjustments()
     end
 
     SelectOffsetX = 0
-end
-
-local function DrawEditableFuelRow(label, value, y, selected)
-    local highlightColor = rgbm.from0255(43, 53, 78)
-
-    if selected then
-        local line = y * Scale + 22
-        ui.drawRectFilled(vec2((20 + 24 + 9) * Scale, line), vec2((422 + 24 + 9) * Scale, line + 22.6 * Scale), highlightColor)
-
-        if DrawLeftSelectionArrow ~= nil then DrawLeftSelectionArrow(line) end
-        if DrawRightSelectionArrow ~= nil then DrawRightSelectionArrow(line) end
-    end
-
-    DrawLabel(label, 0, y)
-    DrawValue(value, 250 + 24 + 9, y, 100, nil, ui.Alignment.Start)
 end
 
 function FuelBlackBox()
@@ -161,27 +53,20 @@ function FuelBlackBox()
         remainingFuelText = string.format("%.1f / %.1f L", math.round(CAR.fuel, 1), math.round(CAR.maxFuel, 1))
     end
 
-    -- DrawEditableFuelRow("Add Next Pit:", string.format("%.1f L", FuelPitAddLitres), 60, SelectOffsetY == 0)
-    DrawEditableFuelRow("Margin (Laps):", string.format("%.1f", FuelLapBuffer), 86, SelectOffsetY == 1)
+    -- DrawEditableValue("Add Next Pit:", string.format("%.1f L", FuelPitAddLitres), 0, 250 + 24 + 9, 60, SelectOffsetY == 0)
+    DrawEditableValue("Margin (Laps):", string.format("%.1f", FuelLapBuffer), 0, 250 + 24 + 9, 86, SelectOffsetY == 1)
 
-    DrawLabel("Estimated Next Pit:", 0, 112)
-    DrawValue(fillNextPitText, 260, 112)
+    DrawDisplayedValue("Estimated Next Pit:", fillNextPitText, 0, 260, 112)
 
-    DrawLabel("Estimated to Finish:", 0, 138)
-    DrawValue(fuelToEndText, 260, 138)
+    DrawDisplayedValue("Estimated to Finish:", fuelToEndText, 0, 260, 138)
 
-    DrawLabel("Remaining:", 0, 164)
-    DrawValue(remainingFuelText, 260, 164)
+    DrawDisplayedValue("Remaining:", remainingFuelText, 0, 260, 164)
 
-    DrawLabel("Est. Laps:", 0, 190)
-    DrawValue(estimatedLapsText, 260, 190)
+    DrawDisplayedValue("Est. Laps:", estimatedLapsText, 0, 260, 190)
 
-    DrawLabel("Est. Time:", 0, 216)
-    DrawValue(estimatedTimeText, 260, 216)
+    DrawDisplayedValue("Est. Time:", estimatedTimeText, 0, 260, 216)
 
-    DrawLabel("Avg / Lap:", 0, 242)
-    DrawValue(averageFuelText, 260, 242)
+    DrawDisplayedValue("Avg / Lap:", averageFuelText, 0, 260, 242)
 
-    DrawLabel("Last / Lap:", 0, 268)
-    DrawValue(lastLapFuelText, 260, 268)
+    DrawDisplayedValue("Last / Lap:", lastLapFuelText, 0, 260, 268)
 end

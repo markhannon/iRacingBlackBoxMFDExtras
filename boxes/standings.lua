@@ -94,17 +94,13 @@ function StandingsBlackBox()
 
     -- Lap
     local summaryColor = rgbm.from0255(244, 244, 244)
-    DrawLabel("Lap:", 24 + 9 + 9, 209 + 65 - 5, 50, nil, ui.Alignment.Start)
-
     local text = tostring(CAR.lapCount + 1)
     if SESSION.type == ac.SessionType.Race then
         text = tostring(CAR.lapCount + 1) .. " / " .. SESSION.laps
     end
-    DrawValue(text, 55 + 24 + 9, 209 + 65 - 5, 32 + 24 + 9 + 32, summaryColor, ui.Alignment.Start)
+    DrawDisplayedValue("Lap:", text, 24 + 9 + 9, 55 + 24 + 9, 209 + 65 - 5, 32 + 24 + 9 + 32, ui.Alignment.Start, 50, nil, summaryColor)
 
     -- Last
-    DrawLabel("Last:", 290 + 24 + 9, 209 + 65 - 5, 50, nil, ui.Alignment.Start)
-
     if CAR.previousLapTimeMs == 0 then
         text = "---"
     else
@@ -114,7 +110,7 @@ function StandingsBlackBox()
         text = string.format("%d:%02d.%03d", minutes, seconds, milliseconds)
         if not CAR.isLastLapValid then text = "*" .. text end
     end
-    DrawValue(text, 0, 209 + 65 - 5, 437 + 24 + 9, summaryColor, ui.Alignment.End)
+    DrawDisplayedValue("Last:", text, 290 + 24 + 9, 0, 209 + 65 - 5, 437 + 24 + 9, ui.Alignment.End, 50, nil, summaryColor)
 
     ui.popDWriteFont()
 end
