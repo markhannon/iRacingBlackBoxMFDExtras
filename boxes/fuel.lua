@@ -4,7 +4,6 @@ end
 
 
 local function ApplyFuelAdjustments()
-    FuelPitAddLitres = tonumber(FuelPitAddLitres) or 0
     FuelLapBuffer = tonumber(FuelLapBuffer) or 1
 
     if SelectOffsetY == "-" then
@@ -17,10 +16,7 @@ local function ApplyFuelAdjustments()
         return
     end
 
-    if SelectOffsetY == 0 then
-        FuelPitAddLitres = math.max(0, math.round(FuelPitAddLitres + 0.5 * SelectOffsetX, 1))
-        FUEL_PIT_ADD_STORAGE:set(FuelPitAddLitres)
-    elseif SelectOffsetY == 1 then
+    if SelectOffsetY == 1 then
         FuelLapBuffer = Clamp(math.round(FuelLapBuffer + 0.1 * SelectOffsetX, 1), 0, 10)
         FUEL_LAP_BUFFER_STORAGE:set(FuelLapBuffer)
     end
@@ -36,7 +32,6 @@ function FuelBlackBox()
 
     ApplyFuelAdjustments()
 
-    FuelPitAddLitres = tonumber(FuelPitAddLitres) or 0
     FuelLapBuffer = tonumber(FuelLapBuffer) or 1
 
     local averageFuelPerLap = GetAverageFuelPerLap()
@@ -53,7 +48,6 @@ function FuelBlackBox()
         remainingFuelText = string.format("%.1f / %.1f L", math.round(CAR.fuel, 1), math.round(CAR.maxFuel, 1))
     end
 
-    -- DrawEditableValue("Add Next Pit:", string.format("%.1f L", FuelPitAddLitres), 0, 250 + 24 + 9, 60, SelectOffsetY == 0)
     DrawEditableValue("Margin (Laps):", string.format("%.1f", FuelLapBuffer), 0, 250 + 24 + 9, 86, SelectOffsetY == 1)
 
     DrawDisplayedValue("Estimated Next Pit:", fillNextPitText, 0, 260, 112)

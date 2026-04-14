@@ -54,9 +54,6 @@ end
 FUEL_LAP_BUFFER_STORAGE = ac.storage("FuelLapBuffer", 1)
 FuelLapBuffer = tonumber(FUEL_LAP_BUFFER_STORAGE:get()) or 1
 
-FUEL_PIT_ADD_STORAGE = ac.storage("FuelPitAddLitres", 0)
-FuelPitAddLitres = tonumber(FUEL_PIT_ADD_STORAGE:get()) or 0
-
 SHOW_DRIVER_NUMBER_STORAGE = ac.storage("ShowDriverNumber", false)
 ShowDriverNumber = readStoredBool(SHOW_DRIVER_NUMBER_STORAGE)
 
@@ -137,13 +134,15 @@ function script.iRacingBlackBoxMFDExtras_Settings(dt)
       Scale = ui.slider("##Scale", Scale, 0.1, 2, "Scale: %.3f")
       SCALE:set(Scale)
 
+      ui.sameLine()
+      if ui.button("Reset Scale to 1##ScaleReset") then
+        Scale = 1
+        SCALE:set(Scale)
+      end
+
       FuelLapBuffer = ui.slider("##FuelLapBuffer", FuelLapBuffer, 0, 10, "Fuel lap buffer: %.1f")
       FuelLapBuffer = math.max(0, math.round(tonumber(FuelLapBuffer) or 1, 1))
       FUEL_LAP_BUFFER_STORAGE:set(FuelLapBuffer)
-
-      FuelPitAddLitres = ui.slider("##FuelPitAddLitres", FuelPitAddLitres, 0, 150, "Next pit add: %.1f L")
-      FuelPitAddLitres = math.max(0, math.round(tonumber(FuelPitAddLitres) or 0, 1))
-      FUEL_PIT_ADD_STORAGE:set(FuelPitAddLitres)
 
       ShowDriverNumber = drawStoredCheckbox("Show Driver Number##ShowDriverNumber", ShowDriverNumber, SHOW_DRIVER_NUMBER_STORAGE)
 

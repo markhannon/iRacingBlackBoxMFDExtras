@@ -8,7 +8,7 @@ function TireInfoBlackBox()
     local wearYellow = rgbm.from0255(255, 255, 0)
 
     local titles = { "LF", "RF", "LR", "RR" }
-    local lineY = 37
+    local lineY = 45
     local lineX
 
     local function ResolveCompoundName()
@@ -119,7 +119,7 @@ function TireInfoBlackBox()
     end
 
     for i = 0, 3 do
-        if i == 2 then lineY = 133 end
+        if i == 2 then lineY = 141 end
         if i % 2 == 0 then lineX = 68 else lineX = 284 end
 
         local wheel = CAR.wheels[i]
@@ -147,7 +147,9 @@ function TireInfoBlackBox()
         tempRangeText = string.format("%d-%dC", math.round(globalMinTemp), math.round(globalMaxTemp))
     end
 
-    DrawDisplayedValue("Temp Range:", tempRangeText, 0, 245 + 24 + 9, 218)
-    DrawDisplayedValue("Compound:", compoundName, 0, 245 + 24 + 9, 248)
+    local summaryY = 248
+    DrawLabel("Tyre:", 0, summaryY, 123)
+    DrawValue(compoundName, 128, summaryY, 120, nil, ui.Alignment.End)
+    DrawDisplayedValue("Range:", tempRangeText, 221, 349, summaryY, 120, ui.Alignment.Start, 123)
 
 end

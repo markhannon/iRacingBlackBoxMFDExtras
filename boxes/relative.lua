@@ -1,8 +1,8 @@
-function RelativeBlackBox(showArrows)
+function RelativeBlackBox(showArrows, showClock)
     ui.beginScale()
 
     if showArrows ~= false then DrawArrows() end
-    DrawWindow("Relative", vec2(33, 22), vec2(479, 323))
+    DrawWindow("Relative", vec2(33, 22), vec2(479, 323), showClock)
 
     ui.pushDWriteFont("Arial;Weight=Bold")
 
@@ -31,13 +31,23 @@ function RelativeBlackBox(showArrows)
     local realIndex = {}
     local myListIndex = 1
     if #positions <= 7 then
-        local startIndex = math.max(1, myPos - 3)
-        local endIndex = math.min(#positions, myPos + 3)
-        for i = startIndex, endIndex do
-            realIndex[#realIndex + 1] = positions[i].index
-            if positions[i].index == CAR.index then
-                myListIndex = #realIndex
+        local beforeCount = math.floor((#positions - 1) / 2)
+        local afterCount = (#positions - 1) - beforeCount
+
+        local counter = 1
+        for i = myPos - beforeCount, myPos + afterCount do
+            local j = i
+            if j < 1 then
+                j = #positions + j
+            elseif j > #positions then
+                j = j - #positions
             end
+
+            realIndex[counter] = positions[j].index
+            if positions[j].index == CAR.index then
+                myListIndex = counter
+            end
+            counter = counter + 1
         end
     else
         local counter = 1
@@ -136,10 +146,10 @@ function RelativeBlackBox(showArrows)
     -- Lap
     local summaryColor = rgbm.from0255(244, 244, 244)
     local text = tostring(CAR.lapCount + 1)
-    if SESSION.type == ac.SessionType.Race then
+    if SESSION.laps ~= nil and SESSION.laps > 0 then
         text = tostring(CAR.lapCount + 1) .. " / " .. SESSION.laps
     end
-    DrawDisplayedValue("Lap:", text, 24 + 9 + 9, 55 + 24 + 9, 209 + 65 - 5, 32 + 24 + 9 + 32, ui.Alignment.Start, 50, nil, summaryColor)
+    DrawDisplayedValue("Lap:", text, 24 + 9 + 9, 80 + 24 + 9, 209 + 65 - 5, 32 + 24 + 9 + 32, ui.Alignment.Start, 50, nil, summaryColor)
 
     -- Last
     if CAR.previousLapTimeMs == 0 then

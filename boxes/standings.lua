@@ -1,10 +1,10 @@
 local firstIndex
 
-function StandingsBlackBox(showArrows)
+function StandingsBlackBox(showArrows, showClock)
     ui.beginScale()
 
     if showArrows ~= false then DrawArrows() end
-    DrawWindow("Standings", vec2(33, 22), vec2(479, 323))
+    DrawWindow("Standings", vec2(33, 22), vec2(479, 323), showClock)
 
     ui.pushDWriteFont("Arial;Weight=Bold")
 
@@ -114,10 +114,10 @@ function StandingsBlackBox(showArrows)
     -- Lap
     local summaryColor = rgbm.from0255(244, 244, 244)
     local text = tostring(CAR.lapCount + 1)
-    if SESSION.type == ac.SessionType.Race then
+    if SESSION.laps ~= nil and SESSION.laps > 0 then
         text = tostring(CAR.lapCount + 1) .. " / " .. SESSION.laps
     end
-    DrawDisplayedValue("Lap:", text, 24 + 9 + 9, 55 + 24 + 9, 209 + 65 - 5, 32 + 24 + 9 + 32, ui.Alignment.Start, 50, nil, summaryColor)
+    DrawDisplayedValue("Lap:", text, 24 + 9 + 9, 80 + 24 + 9, 209 + 65 - 5, 32 + 24 + 9 + 32, ui.Alignment.Start, 50, nil, summaryColor)
 
     -- Last
     if CAR.previousLapTimeMs == 0 then

@@ -3,8 +3,13 @@ function DrawArrows()
     local InactiveColor = rgbm.from0255(0, 0, 0, .3)
     local ActiveColor = rgbm.from0255(221, 182, 35)
     local PressedColor = rgbm.colors.white
-    local LeftBounds = { x1 = 0, x2 = 24, y1 = 160, y2 = 314 }
-    local RightBounds = { x1 = 489, x2 = 513, y1 = 160, y2 = 314 }
+    local ArrowWidth = 24
+    local WindowWidth = BaseWindowWidth or 513
+    local WindowTop = 22
+    local WindowBottom = (BaseWindowHeight or 323)
+    local MidY = (WindowTop + WindowBottom) / 2
+    local LeftBounds = { x1 = 0, x2 = ArrowWidth, y1 = WindowTop, y2 = WindowBottom }
+    local RightBounds = { x1 = WindowWidth - ArrowWidth, x2 = WindowWidth, y1 = WindowTop, y2 = WindowBottom }
 
     local mousePos = ui.mouseLocalPos()
 
@@ -34,8 +39,8 @@ function DrawArrows()
         end
     end
 
-    ui.drawTriangleFilled(vec2(0, 237), vec2(24, 160), vec2(24, 314), leftArrColor)
-    ui.drawTriangleFilled(vec2(513, 237), vec2(489, 160), vec2(489, 314), rightArrColor)
+    ui.drawTriangleFilled(vec2(0, MidY), vec2(ArrowWidth, WindowTop), vec2(ArrowWidth, WindowBottom), leftArrColor)
+    ui.drawTriangleFilled(vec2(WindowWidth, MidY), vec2(WindowWidth - ArrowWidth, WindowTop), vec2(WindowWidth - ArrowWidth, WindowBottom), rightArrColor)
 end
 
 -- Draws a single formatted row of UI text for either a label or a value.
@@ -99,7 +104,7 @@ function DrawEditableValue(label, value, xLabel, xValue, y, selected, valueWidth
 end
 
 -- Draws the common black-box background panel and optional title text.
-function DrawWindow(Title, topLeft, bottomRight)
+function DrawWindow(Title, topLeft, bottomRight, showPCClock)
     local TitleFont = "fonts/eurostarblackextended.ttf"
     local TitleColor = rgbm.from0255(221, 182, 35)
     local BackgroundColor = rgbm.from0255(0, 0, 0, .75)
@@ -116,6 +121,18 @@ function DrawWindow(Title, topLeft, bottomRight)
         ui.pushDWriteFont(TitleFont)
         ui.setCursor(vec2((topLeft.x + TitleOffsetX) * Scale, topLeft.y + (TitleOffsetY * Scale)))
         ui.dwriteText(Title, TitleSize * Scale, TitleColor)
+        ui.popDWriteFont()
+    end
+
+    if showPCClock ~= false then
+        local now = os.date("*t")
+        local hour12 = now.hour % 12
+        if hour12 == 0 then hour12 = 12 end
+        local amPm = now.hour >= 12 and "PM" or "AM"
+        local clockText = string.format("%d:%02d %s", hour12, now.min, amPm)
+        ui.pushDWriteFont(TitleFont)
+        ui.setCursor(vec2(topLeft.x * Scale, topLeft.y + (TitleOffsetY * Scale)))
+        ui.dwriteTextAligned(clockText, TitleSize * Scale, ui.Alignment.End, ui.Alignment.Start, vec2(bottomRight.x - topLeft.x - TitleOffsetX, 30):scale(Scale), false, TitleColor)
         ui.popDWriteFont()
     end
 end

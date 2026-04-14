@@ -116,25 +116,30 @@ function TiresBlackBox()
         if i % 2 == 0 then lineX = 90 else lineX = 295 end
 
         local actualPressure = CAR.wheels[i].tyrePressure
-        local displayValue = string.format("%.1fpsi", actualPressure)
-
-        if hasAllOptimal then
+        local actualDisplayValue = string.format("%.1f psi", actualPressure)
+        local deltaDisplayValue = "N/A"
+        local deltaColor = rgbm.from0255(244, 244, 244)
+        if hasAllOptimal and optimalPressures[i] ~= nil then
             local pressureDelta = actualPressure - optimalPressures[i]
-            displayValue = string.format("%.1fpsi %+.1f", actualPressure, pressureDelta)
+            deltaDisplayValue = string.format("%+.1f  psi", pressureDelta)
+            if pressureDelta < -1 then
+                deltaColor = rgbm.colors.blue
+            elseif pressureDelta > 1 then
+                deltaColor = rgbm.colors.red
+            end
         end
 
         DrawLabel(titles[i + 1], 0, lineY, lineX + 24 + 9)
-        DrawValue(displayValue, 0, lineY, lineX + 125 + 24 + 9, nil, ui.Alignment.End)
+        DrawValue(actualDisplayValue, 0, lineY, lineX + 125 + 24 + 9, nil, ui.Alignment.End)
+        DrawValue(deltaDisplayValue, 0, lineY + 23, lineX + 125 + 24 + 9, deltaColor, ui.Alignment.End, nil, 15)
     end
 
-    if hasAllOptimal then
-        local frontOptimal = (optimalPressures[0] + optimalPressures[1]) / 2
-        local rearOptimal = (optimalPressures[2] + optimalPressures[3]) / 2
-
-        DrawDisplayedValue("Front Optimal:", string.format("%.0fpsi", frontOptimal), 0, 245 + 24 + 9, 188)
-        DrawDisplayedValue("Rear Optimal:", string.format("%.0fpsi", rearOptimal), 0, 245 + 24 + 9, 218)
-        DrawDisplayedValue("Compound:", compoundName, 0, 245 + 24 + 9, 248)
-    else
-        DrawDisplayedValue("Compound:", compoundName, 0, 245 + 24 + 9, 188)
+    local targetText = "N/A"
+    if hasAllOptimal and frontIdealPressure ~= nil and rearIdealPressure ~= nil then
+        targetText = string.format("F %.1f / R %.1f", frontIdealPressure, rearIdealPressure)
     end
+
+    DrawLabel("Tyre:", 0, 248, 123)
+    DrawValue(compoundName, 128, 248, 120, nil, ui.Alignment.End)
+    DrawDisplayedValue("Target:", targetText, 213, 341, 248, 120, ui.Alignment.Start, 123)
 end

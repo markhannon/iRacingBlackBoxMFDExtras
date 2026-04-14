@@ -97,7 +97,7 @@ function script.windowLapTiming(dt)
         return
     end
 
-    LapTimingBlackBox(false)
+    LapTimingBlackBox(false, false)
 end
 
 function script.windowStandings(dt)
@@ -111,7 +111,7 @@ function script.windowStandings(dt)
         return
     end
 
-    StandingsBlackBox(false)
+    StandingsBlackBox(false, false)
 end
 
 function script.windowRelative(dt)
@@ -125,7 +125,7 @@ function script.windowRelative(dt)
         return
     end
 
-    RelativeBlackBox(false)
+    RelativeBlackBox(false, false)
 end
 
 local pressed = false
