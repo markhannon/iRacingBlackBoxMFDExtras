@@ -6,7 +6,7 @@
 - The settings loader uses a hardcoded manifest path under apps/lua/<app-folder>/manifest.ini, so renames must stay consistent.
 
 ## UI helpers
-- Shared drawing helpers live in helpers.lua at the repo root.
+- Shared drawing helpers live in ui.lua at the repo root, while shared telemetry and driver helpers live in data.lua.
 - Black box modules should reuse the shared DrawWindow, DrawItem, DrawLabel, DrawValue, and DrawArrows helpers instead of duplicating them.
 
 ## Fuel black box
@@ -17,7 +17,7 @@
 ## Driver data and multiplayer filtering
 - DriverData uses position >= 1 for active connected drivers. Disconnected or uninitialized entries remain at -1.
 - Relative, Lap Timing, and Standings should only show connected drivers.
-- Use the shared connected-driver helpers in boxes/globalData.lua instead of relying on raw SIM.carsCount alone.
+- Use the shared connected-driver helpers in data.lua instead of relying on raw SIM.carsCount alone.
 - Driver positions are reset each update to avoid stale offline entries showing in black boxes.
 
 ## Diagnostics
