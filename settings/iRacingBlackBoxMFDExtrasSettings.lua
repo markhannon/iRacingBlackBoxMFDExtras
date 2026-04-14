@@ -1,6 +1,12 @@
 SCALE = ac.storage("Scale", 1)
 Scale = SCALE:get()
 
+FUEL_LAP_BUFFER_STORAGE = ac.storage("FuelLapBuffer", 1)
+FuelLapBuffer = tonumber(FUEL_LAP_BUFFER_STORAGE:get()) or 1
+
+FUEL_PIT_ADD_STORAGE = ac.storage("FuelPitAddLitres", 0)
+FuelPitAddLitres = tonumber(FUEL_PIT_ADD_STORAGE:get()) or 0
+
 IniFile = ac.INIConfig.load(ac.getFolder(ac.FolderID.ACApps) .. "\\lua\\iRacingBlackBoxMFDExtras\\manifest.ini")
 
 BaseWindowWidth = 447 + 2 * (24 + 9)
@@ -68,6 +74,14 @@ function script.iRacingBlackBoxMFDExtras_Settings(dt)
 
       Scale = ui.slider("##Scale", Scale, 0.1, 2, "Scale: %.3f")
       SCALE:set(Scale)
+
+      FuelLapBuffer = ui.slider("##FuelLapBuffer", FuelLapBuffer, 0, 10, "Fuel lap buffer: %.1f")
+      FuelLapBuffer = math.max(0, math.round(tonumber(FuelLapBuffer) or 1, 1))
+      FUEL_LAP_BUFFER_STORAGE:set(FuelLapBuffer)
+
+      FuelPitAddLitres = ui.slider("##FuelPitAddLitres", FuelPitAddLitres, 0, 150, "Next pit add: %.1f L")
+      FuelPitAddLitres = math.max(0, math.round(tonumber(FuelPitAddLitres) or 0, 1))
+      FUEL_PIT_ADD_STORAGE:set(FuelPitAddLitres)
 
       NewWindowHeight = (BaseWindowHeight - 22) * Scale + 22
       NewWindowWidth = BaseWindowWidth * Scale

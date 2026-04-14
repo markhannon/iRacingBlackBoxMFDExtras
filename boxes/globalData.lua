@@ -6,6 +6,59 @@ DriverData = {}
 PrevDriverData = {}
 DriverSpline = {}
 
+FuelLastLapUsage = 0
+FuelAverageUsagePerLap = 0
+FuelUsageSamples = 0
+FuelPreviousLapCount = 0
+FuelLapStartFuel = 0
+FuelLastKnownFuel = 0
+
+local function ResetFuelTracking()
+    if CAR == nil then return end
+
+    FuelLastLapUsage = 0
+    FuelAverageUsagePerLap = 0
+    FuelUsageSamples = 0
+    FuelPreviousLapCount = CAR.lapCount or 0
+    FuelLapStartFuel = CAR.fuel or 0
+    FuelLastKnownFuel = CAR.fuel or 0
+end
+
+local function UpdateFuelTracking()
+    if CAR == nil then return end
+
+    local currentLap = CAR.lapCount or 0
+    local currentFuel = CAR.fuel or 0
+
+    if currentLap < FuelPreviousLapCount or currentLap - FuelPreviousLapCount > 1 or currentFuel > FuelLastKnownFuel + 1 then
+        ResetFuelTracking()
+        FuelPreviousLapCount = currentLap
+        FuelLapStartFuel = currentFuel
+        FuelLastKnownFuel = currentFuel
+        return
+    end
+
+    if currentLap > FuelPreviousLapCount then
+        local lapUsage = FuelLapStartFuel - currentFuel
+        if lapUsage > 0 and lapUsage < 50 then
+            FuelLastLapUsage = lapUsage
+
+            if FuelUsageSamples == 0 then
+                FuelAverageUsagePerLap = lapUsage
+            else
+                FuelAverageUsagePerLap = ((FuelAverageUsagePerLap * FuelUsageSamples) + lapUsage) / (FuelUsageSamples + 1)
+            end
+
+            FuelUsageSamples = FuelUsageSamples + 1
+        end
+
+        FuelLapStartFuel = currentFuel
+        FuelPreviousLapCount = currentLap
+    end
+
+    FuelLastKnownFuel = currentFuel
+end
+
 function FirstInit()
     SIM = ac.getSim()
     CAR = ac.getCar(SIM.focusedCar)
@@ -29,6 +82,8 @@ function FirstInit()
         DriverSpline[i][1] = {}
         DriverSpline[i][1].currentSpline = 0
     end
+
+    ResetFuelTracking()
 end
 
 function GlobalUpdates()
@@ -62,6 +117,8 @@ function GlobalUpdates()
             UpdateSplineInfo(driverIndex)
         end
     end
+
+    UpdateFuelTracking()
 end
 
 function CheckValidLap(driverIndex)
