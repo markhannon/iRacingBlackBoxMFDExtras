@@ -1,7 +1,7 @@
-function LapTimingBlackBox()
+function LapTimingBlackBox(showArrows)
     ui.beginScale()
 
-    DrawArrows()
+    if showArrows ~= false then DrawArrows() end
     DrawWindow("Lap Timing", vec2(33, 72), vec2(479, 323))
 
     local minutes

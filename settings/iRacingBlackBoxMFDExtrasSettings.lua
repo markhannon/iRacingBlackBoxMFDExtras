@@ -1,5 +1,55 @@
 SCALE = ac.storage("Scale", 1)
-Scale = SCALE:get()
+Scale = tonumber(SCALE:get()) or 1
+
+local function normalizeBool(value, fallback)
+  if type(value) == "boolean" then return value end
+  if type(value) == "number" then return value ~= 0 end
+  if type(value) == "string" then return value == "true" or value == "1" end
+  if value == nil then return fallback == true end
+  return not not value
+end
+
+local function readStoredBool(storage)
+  return normalizeBool(storage:get(), false)
+end
+
+local LastSeparateWindowStates = {
+  lapTiming = nil,
+  standings = nil,
+  relative = nil,
+}
+
+local function drawStoredCheckbox(label, currentValue, storage)
+  if ui.checkbox(label, currentValue) then
+    currentValue = not currentValue
+    storage:set(currentValue)
+  end
+
+  return currentValue
+end
+
+function syncSeparateWindows(force)
+  if ac.setWindowOpen == nil then
+    return
+  end
+
+  local desiredStates = {
+    lapTiming = ShowSeparateLapTiming == true,
+    standings = ShowSeparateStandings == true,
+    relative = ShowSeparateRelative == true,
+  }
+
+  if (desiredStates.lapTiming or desiredStates.standings or desiredStates.relative) and ac.setAppOpen ~= nil then
+    ac.setAppOpen("iRacingBlackBoxMFDExtras")
+  end
+
+  for windowId, desiredState in pairs(desiredStates) do
+    if force or LastSeparateWindowStates[windowId] ~= desiredState then
+      ac.setWindowOpen(windowId, desiredState)
+      LastSeparateWindowStates[windowId] = desiredState
+    end
+  end
+end
 
 FUEL_LAP_BUFFER_STORAGE = ac.storage("FuelLapBuffer", 1)
 FuelLapBuffer = tonumber(FUEL_LAP_BUFFER_STORAGE:get()) or 1
@@ -8,8 +58,16 @@ FUEL_PIT_ADD_STORAGE = ac.storage("FuelPitAddLitres", 0)
 FuelPitAddLitres = tonumber(FUEL_PIT_ADD_STORAGE:get()) or 0
 
 SHOW_DRIVER_NUMBER_STORAGE = ac.storage("ShowDriverNumber", false)
-local showDriverNumberValue = SHOW_DRIVER_NUMBER_STORAGE:get()
-ShowDriverNumber = showDriverNumberValue == true or showDriverNumberValue == "true" or tonumber(showDriverNumberValue) == 1
+ShowDriverNumber = readStoredBool(SHOW_DRIVER_NUMBER_STORAGE)
+
+SHOW_SEPARATE_LAP_TIMING_STORAGE = ac.storage("ShowSeparateLapTiming", false)
+ShowSeparateLapTiming = readStoredBool(SHOW_SEPARATE_LAP_TIMING_STORAGE)
+
+SHOW_SEPARATE_STANDINGS_STORAGE = ac.storage("ShowSeparateStandings", false)
+ShowSeparateStandings = readStoredBool(SHOW_SEPARATE_STANDINGS_STORAGE)
+
+SHOW_SEPARATE_RELATIVE_STORAGE = ac.storage("ShowSeparateRelative", false)
+ShowSeparateRelative = readStoredBool(SHOW_SEPARATE_RELATIVE_STORAGE)
 
 IniFile = ac.INIConfig.load(ac.getFolder(ac.FolderID.ACApps) .. "\\lua\\iRacingBlackBoxMFDExtras\\manifest.ini")
 
@@ -87,14 +145,22 @@ function script.iRacingBlackBoxMFDExtras_Settings(dt)
       FuelPitAddLitres = math.max(0, math.round(tonumber(FuelPitAddLitres) or 0, 1))
       FUEL_PIT_ADD_STORAGE:set(FuelPitAddLitres)
 
-      ShowDriverNumber = ui.checkbox("Show Driver Number##ShowDriverNumber", ShowDriverNumber)
-      SHOW_DRIVER_NUMBER_STORAGE:set(tostring(ShowDriverNumber))
+      ShowDriverNumber = drawStoredCheckbox("Show Driver Number##ShowDriverNumber", ShowDriverNumber, SHOW_DRIVER_NUMBER_STORAGE)
+
+      ShowSeparateLapTiming = drawStoredCheckbox("Show Separate Lap Timing##ShowSeparateLapTiming", ShowSeparateLapTiming, SHOW_SEPARATE_LAP_TIMING_STORAGE)
+
+      ShowSeparateStandings = drawStoredCheckbox("Show Separate Standings##ShowSeparateStandings", ShowSeparateStandings, SHOW_SEPARATE_STANDINGS_STORAGE)
+
+      ShowSeparateRelative = drawStoredCheckbox("Show Separate Relative##ShowSeparateRelative", ShowSeparateRelative, SHOW_SEPARATE_RELATIVE_STORAGE)
+
+      syncSeparateWindows()
 
       NewWindowHeight = (BaseWindowHeight - 22) * Scale + 22
       NewWindowWidth = BaseWindowWidth * Scale
 
       if NewWindowHeight ~= OldWindowHeight or NewWindowWidth ~= OldWindowWidth then
-        IniFile:setAndSave("WINDOW_...", "SIZE", tostring(NewWindowWidth) .. ", " .. tostring(NewWindowHeight))
+        local newSize = tostring(NewWindowWidth) .. ", " .. tostring(NewWindowHeight)
+        IniFile:setAndSave("WINDOW_...", "SIZE", newSize)
         OldWindowHeight = NewWindowHeight
         OldWindowWidth = NewWindowWidth
       end

@@ -1,9 +1,9 @@
 local firstIndex
 
-function StandingsBlackBox()
+function StandingsBlackBox(showArrows)
     ui.beginScale()
 
-    DrawArrows()
+    if showArrows ~= false then DrawArrows() end
     DrawWindow("Standings", vec2(33, 87), vec2(479, 323))
 
     ui.pushDWriteFont("Arial;Weight=Bold")

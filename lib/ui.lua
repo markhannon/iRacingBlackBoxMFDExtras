@@ -9,7 +9,7 @@ function DrawArrows()
     local mousePos = ui.mouseLocalPos()
 
     local leftArrColor = InactiveColor
-    if mousePos.x >= LeftBounds.x1 and mousePos.x <= LeftBounds.x2 * Scale and mousePos.y >= LeftBounds.y1 * Scale and mousePos.y <= LeftBounds.y2 * Scale then
+    if mousePos.x >= LeftBounds.x1 * Scale and mousePos.x <= LeftBounds.x2 * Scale and mousePos.y >= LeftBounds.y1 * Scale and mousePos.y <= LeftBounds.y2 * Scale then
         leftArrColor = ActiveColor
 
         if ui.mouseDown(ui.MouseButton.Left) then

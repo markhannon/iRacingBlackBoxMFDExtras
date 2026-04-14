@@ -17,6 +17,7 @@ SelectOffsetX = 0
 
 FirstSetup = false
 TIME = 0
+LastSharedUpdateSessionTime = -1
 
 currentBlackBox = 7
 
@@ -26,11 +27,10 @@ if ac.onSessionStart then
     end)
 end
 
-function script.windowMain(dt)
+function RefreshSharedState(dt)
     SIM = ac.getSim()
     CAR = ac.getCar(SIM.focusedCar)
     SESSION = ac.getSession(SIM.currentSessionIndex)
-    TIME = TIME + dt
 
     if not FirstSetup or PrevSessionIndex ~= SIM.currentSessionIndex or SIM.currentSessionTime <= 1000 then
         FirstInit()
@@ -38,10 +38,25 @@ function script.windowMain(dt)
         PrevSessionIndex = SIM.currentSessionIndex
     end
 
+    if LastSharedUpdateSessionTime ~= SIM.currentSessionTime then
+        TIME = TIME + dt
+        if CAR ~= nil then
+            GlobalUpdates()
+        end
+        LastSharedUpdateSessionTime = SIM.currentSessionTime
+    end
+
+    if syncSeparateWindows ~= nil then
+        syncSeparateWindows()
+    end
+end
+
+function script.windowMain(dt)
+    RefreshSharedState(dt)
+
     if CAR == nil then
         ac.debug("focused driver error")
     else
-        GlobalUpdates()
         CheckButtonInput()
 
         if PrevBlackBox ~= currentBlackBox then
@@ -69,6 +84,48 @@ function script.windowMain(dt)
             BlankBlackBox()
         end
     end
+end
+
+function script.windowLapTiming(dt)
+    RefreshSharedState(dt)
+
+    if not ShowSeparateLapTiming then
+        return
+    end
+
+    if CAR == nil then
+        return
+    end
+
+    LapTimingBlackBox(false)
+end
+
+function script.windowStandings(dt)
+    RefreshSharedState(dt)
+
+    if not ShowSeparateStandings then
+        return
+    end
+
+    if CAR == nil then
+        return
+    end
+
+    StandingsBlackBox(false)
+end
+
+function script.windowRelative(dt)
+    RefreshSharedState(dt)
+
+    if not ShowSeparateRelative then
+        return
+    end
+
+    if CAR == nil then
+        return
+    end
+
+    RelativeBlackBox(false)
 end
 
 local pressed = false
