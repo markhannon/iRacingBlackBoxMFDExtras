@@ -4,7 +4,7 @@ function StandingsBlackBox(showArrows)
     ui.beginScale()
 
     if showArrows ~= false then DrawArrows() end
-    DrawWindow("Standings", vec2(33, 87), vec2(479, 323))
+    DrawWindow("Standings", vec2(33, 22), vec2(479, 323))
 
     ui.pushDWriteFont("Arial;Weight=Bold")
 
@@ -71,13 +71,28 @@ function StandingsBlackBox(showArrows)
                 if DriverData[driverIndex].position == 1 then
                     timeText = "---"
                 else
-                    local ownTime = DriverSpline[driverIndex][ac.getCar(driverIndex).lapCount + 1][DriverSpline[driverIndex][ac.getCar(driverIndex).lapCount + 1].currentSpline - 1]
-                    local firstTime = DriverSpline[firstIndex][ac.getCar(driverIndex).lapCount + 1][DriverSpline[driverIndex][ac.getCar(driverIndex).lapCount + 1].currentSpline - 1]
-                    if ownTime == nil or firstTime == nil then
-                        timeText = "---"
+                    local driverCar = ac.getCar(driverIndex)
+                    local firstCar = ac.getCar(firstIndex)
+                    local lapDiff = firstCar.lapCount - driverCar.lapCount
+                    if lapDiff > 0 then
+                        timeText = string.format("-%dL", lapDiff)
                     else
-                        local seconds = math.round(firstTime - ownTime, 1)
-                        timeText = string.format("%.1f", seconds)
+                        local lapIndex = driverCar.lapCount + 1
+                        local splineState = DriverSpline[driverIndex][lapIndex]
+                        if splineState == nil then
+                            timeText = "---"
+                        else
+                            local splineIndex = splineState.currentSpline - 1
+                            local ownTime = splineState[splineIndex]
+                            local firstLapSpline = DriverSpline[firstIndex][lapIndex]
+                            local firstTime = firstLapSpline and firstLapSpline[splineIndex] or nil
+                            if ownTime == nil or firstTime == nil then
+                                timeText = "---"
+                            else
+                                local seconds = math.round(firstTime - ownTime, 1)
+                                timeText = string.format("%.1f", seconds)
+                            end
+                        end
                     end
                 end
             else

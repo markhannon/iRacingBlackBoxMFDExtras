@@ -2,7 +2,7 @@ function RelativeBlackBox(showArrows)
     ui.beginScale()
 
     if showArrows ~= false then DrawArrows() end
-    DrawWindow("Relative", vec2(33, 93), vec2(479, 323))
+    DrawWindow("Relative", vec2(33, 22), vec2(479, 323))
 
     ui.pushDWriteFont("Arial;Weight=Bold")
 
