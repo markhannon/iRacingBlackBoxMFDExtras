@@ -19,10 +19,10 @@ function TiresBlackBox()
     DrawArrows()
     DrawWindow("Tires", vec2(33, 22), vec2(479, 323))
 
-    local titles = { "LF:", "RF:", "LR:", "RR:" }
+    local titles = { "LF", "RF", "LR", "RR" }
     local optimalPressures = {}
     local hasAllOptimal = true
-    local lineY = 65
+    local lineY = 45
     local lineX
 
     local function ResolveCompoundName()
@@ -112,8 +112,8 @@ function TiresBlackBox()
     end
 
     for i = 0, 3 do
-        if i == 2 then lineY = 147 end
-        if i % 2 == 0 then lineX = 90 else lineX = 295 end
+        if i == 2 then lineY = 141 end
+        if i % 2 == 0 then lineX = 68 else lineX = 284 end
 
         local actualPressure = CAR.wheels[i].tyrePressure
         local actualDisplayValue = string.format("%.1f psi", actualPressure)
@@ -129,9 +129,9 @@ function TiresBlackBox()
             end
         end
 
-        DrawLabel(titles[i + 1], 0, lineY, lineX + 24 + 9)
-        DrawValue(actualDisplayValue, 0, lineY, lineX + 125 + 24 + 9, nil, ui.Alignment.End)
-        DrawValue(deltaDisplayValue, 0, lineY + 23, lineX + 125 + 24 + 9, deltaColor, ui.Alignment.End, nil, 15)
+        DrawLabel(titles[i + 1], lineX + 60, lineY, 100, nil, ui.Alignment.Start)
+        DrawValue(actualDisplayValue, lineX + 60, lineY + 28, 140, nil, ui.Alignment.Start)
+        DrawValue(deltaDisplayValue, lineX + 60, lineY + 56, 140, deltaColor, ui.Alignment.Start, nil, 15)
     end
 
     local targetText = "N/A"
