@@ -6,37 +6,52 @@ function RelativeBlackBox()
 
     ui.pushDWriteFont("Arial;Weight=Bold")
 
-    -- get index sorted
+    -- get connected drivers sorted by spline position
     local positions = {}
-    for i = 1, SIM.carsCount do
-        positions[i] = {}
-        positions[i].index = i - 1
-        positions[i].pos = ac.getCar(i - 1).splinePosition
+    for i = 0, SIM.carsCount - 1 do
+        if IsDriverConnected(i) then
+            table.insert(positions, {
+                index = i,
+                pos = ac.getCar(i).splinePosition
+            })
+        end
     end
     table.sort(positions, function(lhs, rhs) return lhs.pos > rhs.pos end)
 
     -- get position / index in table positions
-    local myPos
-    for i = 1, SIM.carsCount do
+    local myPos = 1
+    for i = 1, #positions do
         if positions[i].index == CAR.index then
             myPos = i
+            break
         end
     end
 
     -- get the driver index around me
-    local counter = 1
     local realIndex = {}
-    if SIM.carsCount < 7 then
-        realIndex[1] = 0
+    local myListIndex = 1
+    if #positions <= 7 then
+        local startIndex = math.max(1, myPos - 3)
+        local endIndex = math.min(#positions, myPos + 3)
+        for i = startIndex, endIndex do
+            realIndex[#realIndex + 1] = positions[i].index
+            if positions[i].index == CAR.index then
+                myListIndex = #realIndex
+            end
+        end
     else
+        local counter = 1
         for i = myPos - 3, myPos + 3 do
             local j = i
             if j < 1 then
-                j = SIM.carsCount + j
-            elseif j > SIM.carsCount then
-                j = j - SIM.carsCount
+                j = #positions + j
+            elseif j > #positions then
+                j = j - #positions
             end
             realIndex[counter] = positions[j].index
+            if positions[j].index == CAR.index then
+                myListIndex = counter
+            end
             counter = counter + 1
         end
     end
@@ -76,24 +91,30 @@ function RelativeBlackBox()
         local driverTime = nil
 
         local driverLap
-        if i < 4 then
-            if ac.getCar(realIndex[i]).lapCount == CAR.lapCount or ac.getCar(realIndex[i]).lapCount > CAR.lapCount then
+        if i < myListIndex then
+            if ac.getCar(realIndex[i]).lapCount >= CAR.lapCount then
                 driverLap = CAR.lapCount + 1
             else
                 driverLap = ac.getCar(realIndex[i]).lapCount + 1
             end
-        elseif i > 4 then
+        elseif i > myListIndex then
             driverLap = ac.getCar(realIndex[i]).lapCount + 1
         end
 
-        if i == 4 then
+        if i == myListIndex then
             myTime = nil
-        elseif i < 4 then
-            myTime = DriverSpline[CAR.index][CAR.lapCount + 1][DriverSpline[CAR.index][CAR.lapCount + 1].currentSpline - 1]
-            driverTime = DriverSpline[realIndex[i]][driverLap][DriverSpline[CAR.index][CAR.lapCount + 1].currentSpline - 1]
+        elseif i < myListIndex then
+            local mySplineLap = DriverSpline[CAR.index][CAR.lapCount + 1]
+            local driverSplineLap = DriverSpline[realIndex[i]][driverLap]
+            local splineIndex = mySplineLap and mySplineLap.currentSpline - 1 or nil
+            myTime = mySplineLap and splineIndex and mySplineLap[splineIndex] or nil
+            driverTime = driverSplineLap and splineIndex and driverSplineLap[splineIndex] or nil
         else
-            myTime = DriverSpline[CAR.index][CAR.lapCount + 1][DriverSpline[realIndex[i]][driverLap].currentSpline - 1]
-            driverTime = DriverSpline[realIndex[i]][driverLap][DriverSpline[realIndex[i]][driverLap].currentSpline - 1]
+            local mySplineLap = DriverSpline[CAR.index][CAR.lapCount + 1]
+            local driverSplineLap = DriverSpline[realIndex[i]][driverLap]
+            local splineIndex = driverSplineLap and driverSplineLap.currentSpline - 1 or nil
+            myTime = mySplineLap and splineIndex and mySplineLap[splineIndex] or nil
+            driverTime = driverSplineLap and splineIndex and driverSplineLap[splineIndex] or nil
         end
 
         if myTime == nil or driverTime == nil then

@@ -8,56 +8,48 @@ function StandingsBlackBox()
 
     ui.pushDWriteFont("Arial;Weight=Bold")
 
+    local connectedCount = GetConnectedDriverCount()
     local startPos = DriverData[CAR.index].position - 3
     local endPos = startPos + 6
 
-    if SIM.carsCount < 7 then
+    if connectedCount < 7 then
         startPos = 1
-        endPos = SIM.carsCount
+        endPos = connectedCount
     elseif startPos < 1 then
         startPos = 1
         endPos = 7
-    elseif endPos > SIM.carsCount then
-        startPos = SIM.carsCount - 6
-        endPos = SIM.carsCount
+    elseif endPos > connectedCount then
+        startPos = connectedCount - 6
+        endPos = connectedCount
     end
 
     if SelectOffsetY == "-" then SelectOffsetY = 0 end
 
-    if SIM.carsCount < 7 then
+    if connectedCount < 7 then
         SelectOffsetY = 0
     elseif SelectOffsetY < 1 - startPos then
         SelectOffsetY = 1 - startPos
-    elseif SelectOffsetY > SIM.carsCount - 6 - startPos then
-        SelectOffsetY = SIM.carsCount - 6 - startPos
+    elseif SelectOffsetY > connectedCount - 6 - startPos then
+        SelectOffsetY = connectedCount - 6 - startPos
     end
 
     startPos = startPos + SelectOffsetY
     endPos = endPos + SelectOffsetY
 
     local lineY = 45 + 65 - 7
-    if SIM.carsCount == 1 then
+    if connectedCount <= 1 then
         lineY = lineY + 23 * 3
     end
 
-    for i=0, SIM.carsCount-1 do
-        if DriverData[i].position == 1 then
-            firstIndex = i
-        end
-    end
+    firstIndex = GetDriverIndexForPosition(1)
 
     for currPos = startPos, endPos do
         local color = rgbm.from0255(244, 244, 244)
         if currPos == DriverData[CAR.index].position then color = rgbm.from0255(221, 182, 35) end
 
-        local driverIndex
-        for i = 0, SIM.carsCount - 1 do
-            if DriverData[i].position == currPos then
-                driverIndex = i
-            end
-        end
-
-        ui.setCursor(vec2(0, lineY * Scale + 22))
+        local driverIndex = GetDriverIndexForPosition(currPos)
+        if driverIndex ~= -1 then
+            ui.setCursor(vec2(0, lineY * Scale + 22))
         ui.dwriteTextAligned(DriverData[driverIndex].position, 17 * Scale, ui.Alignment.End, ui.Alignment.Start, vec2(32 + 24 + 9, 30):scale(Scale), false, color)
 
         ui.setCursor(vec2(0, lineY * Scale + 22))
@@ -94,7 +86,8 @@ function StandingsBlackBox()
                 timeText = string.format("%d:%02d.%03d", minutes, seconds, milliseconds)
             end
         end
-        ui.dwriteTextAligned(timeText, 17 * Scale, ui.Alignment.End, ui.Alignment.Start, vec2(437 + 24 + 9, 30):scale(Scale), false, color)
+            ui.dwriteTextAligned(timeText, 17 * Scale, ui.Alignment.End, ui.Alignment.Start, vec2(437 + 24 + 9, 30):scale(Scale), false, color)
+        end
 
         lineY = lineY + 23
     end

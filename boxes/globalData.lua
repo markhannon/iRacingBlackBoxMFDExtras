@@ -59,6 +59,39 @@ local function UpdateFuelTracking()
     FuelLastKnownFuel = currentFuel
 end
 
+function IsDriverConnected(driverIndex)
+    if driverIndex == nil or driverIndex < 0 or driverIndex >= SIM.carsCount then
+        return false
+    end
+
+    local car = ac.getCar(driverIndex)
+    return car ~= nil and car.isConnected and DriverData[driverIndex] ~= nil and (DriverData[driverIndex].position or -1) > 0
+end
+
+function GetConnectedDriverCount()
+    local count = 0
+    for i = 0, SIM.carsCount - 1 do
+        if IsDriverConnected(i) then
+            count = count + 1
+        end
+    end
+    return count
+end
+
+function GetDriverIndexForPosition(position)
+    if position == nil or position < 1 then
+        return -1
+    end
+
+    for i = 0, SIM.carsCount - 1 do
+        if IsDriverConnected(i) and DriverData[i].position == position then
+            return i
+        end
+    end
+
+    return -1
+end
+
 function FirstInit()
     SIM = ac.getSim()
     CAR = ac.getCar(SIM.focusedCar)
@@ -87,6 +120,10 @@ function FirstInit()
 end
 
 function GlobalUpdates()
+    for i = 0, SIM.carsCount - 1 do
+        DriverData[i].position = -1
+    end
+
     if SIM.carsCount == 1 then
         DriverData[CAR.index].position = 1
         DriverData[CAR.index].driverName = CAR:driverName()
@@ -106,15 +143,18 @@ function GlobalUpdates()
         end
     else
         for i = 0, SIM.carsCount - 1 do
-            local driverIndex = SESSION.leaderboard[i].car.index
+            local leaderboardEntry = SESSION.leaderboard[i]
+            if leaderboardEntry ~= nil and leaderboardEntry.car ~= nil then
+                local driverIndex = leaderboardEntry.car.index
 
-            DriverData[driverIndex].position = i + 1
-            DriverData[driverIndex].driverName = SESSION.leaderboard[i].car:driverName()
-            DriverData[driverIndex].driverNumber = SESSION.leaderboard[i].car:driverNumber()
+                DriverData[driverIndex].position = i + 1
+                DriverData[driverIndex].driverName = leaderboardEntry.car:driverName()
+                DriverData[driverIndex].driverNumber = leaderboardEntry.car:driverNumber()
 
-            CheckValidLap(driverIndex)
-            CheckIncidents(driverIndex)
-            UpdateSplineInfo(driverIndex)
+                CheckValidLap(driverIndex)
+                CheckIncidents(driverIndex)
+                UpdateSplineInfo(driverIndex)
+            end
         end
     end
 

@@ -136,13 +136,8 @@ function LapTimingBlackBox()
     ui.dwriteTextAligned(timeText, 17 * Scale, ui.Alignment.End, ui.Alignment.Start, vec2(466, 30):scale(Scale), false, rgbm.from0255(244, 244, 244))
 
     -- ahead calculations
-    local driverIndex
-    if DriverData[CAR.index].position == 1 then driverIndex = -1 end
-    for i = 0, SIM.carsCount - 1 do
-        if DriverData[i].position == DriverData[CAR.index].position - 1 then
-            driverIndex = i
-        end
-    end
+    local connectedCount = GetConnectedDriverCount()
+    local driverIndex = GetDriverIndexForPosition(DriverData[CAR.index].position - 1)
 
     -- Ahead Text
     ui.setCursor(vec2(43 * Scale, (217 * Scale) + 22))
@@ -164,11 +159,14 @@ function LapTimingBlackBox()
     ui.setCursor(vec2(0, (217 * Scale) + 22))
 
     if SESSION.type == ac.SessionType.Race then
-        if DriverData[CAR.index].position == 1 then
+        if DriverData[CAR.index].position == 1 or driverIndex == -1 then
             timeText = "---"
         else
-            local myTime = DriverSpline[CAR.index][CAR.lapCount + 1][DriverSpline[CAR.index][CAR.lapCount + 1].currentSpline - 1]
-            local aheadTime = DriverSpline[driverIndex][CAR.lapCount + 1][DriverSpline[CAR.index][CAR.lapCount + 1].currentSpline - 1]
+            local mySplineLap = DriverSpline[CAR.index][CAR.lapCount + 1]
+            local aheadSplineLap = DriverSpline[driverIndex][CAR.lapCount + 1]
+            local splineIndex = mySplineLap and mySplineLap.currentSpline - 1 or nil
+            local myTime = mySplineLap and splineIndex and mySplineLap[splineIndex] or nil
+            local aheadTime = aheadSplineLap and splineIndex and aheadSplineLap[splineIndex] or nil
             if myTime == nil or aheadTime == nil then
                 timeText = "---"
             else
@@ -177,7 +175,7 @@ function LapTimingBlackBox()
             end
         end
     else
-        if DriverData[CAR.index].position == 1 or DriverData[driverIndex].bestLap == 0 or DriverData[CAR.index].bestLap == 0 then
+        if DriverData[CAR.index].position == 1 or driverIndex == -1 or DriverData[driverIndex].bestLap == 0 or DriverData[CAR.index].bestLap == 0 then
             timeText = "---"
         else
             local tmp = DriverData[CAR.index].bestLap / 1000 - DriverData[driverIndex].bestLap / 1000
@@ -189,12 +187,7 @@ function LapTimingBlackBox()
 
 
     -- behind calculations
-    if DriverData[CAR.index].position == SIM.carsCount then driverIndex = -1 end
-    for i = 0, SIM.carsCount - 1 do
-        if DriverData[i].position == DriverData[CAR.index].position + 1 then
-            driverIndex = i
-        end
-    end
+    driverIndex = GetDriverIndexForPosition(DriverData[CAR.index].position + 1)
 
     -- Behind Text
     ui.setCursor(vec2(43 * Scale, (243 * Scale) + 22))
@@ -215,11 +208,15 @@ function LapTimingBlackBox()
     -- Behind interval
     ui.setCursor(vec2(0, (243 * Scale) + 22))
     if SESSION.type == ac.SessionType.Race then
-        if DriverData[CAR.index].position == SIM.carsCount then
+        if DriverData[CAR.index].position == connectedCount or driverIndex == -1 then
             timeText = "---"
         else
-            local myTime = DriverSpline[CAR.index][ac.getCar(driverIndex).lapCount + 1][DriverSpline[driverIndex][ac.getCar(driverIndex).lapCount + 1].currentSpline - 1]
-            local aheadTime = DriverSpline[driverIndex][ac.getCar(driverIndex).lapCount + 1][DriverSpline[driverIndex][ac.getCar(driverIndex).lapCount + 1].currentSpline - 1]
+            local driverLap = ac.getCar(driverIndex).lapCount + 1
+            local mySplineLap = DriverSpline[CAR.index][driverLap]
+            local behindSplineLap = DriverSpline[driverIndex][driverLap]
+            local splineIndex = behindSplineLap and behindSplineLap.currentSpline - 1 or nil
+            local myTime = mySplineLap and splineIndex and mySplineLap[splineIndex] or nil
+            local aheadTime = behindSplineLap and splineIndex and behindSplineLap[splineIndex] or nil
             if myTime == nil or aheadTime == nil then
                 timeText = "---"
             else
@@ -228,7 +225,7 @@ function LapTimingBlackBox()
             end
         end
     else
-        if DriverData[CAR.index].position == SIM.carsCount or DriverData[driverIndex].bestLap == 0 or DriverData[CAR.index].bestLap == 0 then
+        if DriverData[CAR.index].position == connectedCount or driverIndex == -1 or DriverData[driverIndex].bestLap == 0 or DriverData[CAR.index].bestLap == 0 then
             timeText = "---"
         else
             local tmp = DriverData[CAR.index].bestLap / 1000 - DriverData[driverIndex].bestLap / 1000
