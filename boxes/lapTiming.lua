@@ -2,7 +2,7 @@ function LapTimingBlackBox(showArrows)
     ui.beginScale()
 
     if showArrows ~= false then DrawArrows() end
-    DrawWindow("Lap Timing", vec2(33, 72), vec2(479, 323))
+    DrawWindow("Lap Timing", vec2(33, 22), vec2(479, 323))
 
     local minutes
     local seconds
@@ -29,16 +29,12 @@ function LapTimingBlackBox(showArrows)
             ui.dwriteTextAligned("Elapsed:", 17 * Scale, ui.Alignment.End, ui.Alignment.Start, vec2(361, 30):scale(Scale), false, rgbm.from0255(221, 182, 35))
 
             ui.setCursor(vec2(0, (88 * Scale) + 22))
-            minutes = SIM.currentSessionTime / 60E3
-            seconds = (minutes % 1) * 60
-            timeText = string.format("%02d:%02d", minutes, seconds)
+            timeText = FormatSessionDuration(SIM.currentSessionTime)
         else
             ui.dwriteTextAligned("Remaining:", 17 * Scale, ui.Alignment.End, ui.Alignment.Start, vec2(361, 30):scale(Scale), false, rgbm.from0255(221, 182, 35))
 
             ui.setCursor(vec2(0, (88 * Scale) + 22))
-            minutes = SIM.sessionTimeLeft / 60E3
-            seconds = (minutes % 1) * 60
-            timeText = string.format("%02d:%02d", minutes, seconds)
+            timeText = FormatSessionDuration(SIM.sessionTimeLeft)
         end
 
         ui.dwriteTextAligned(timeText, 17 * Scale, ui.Alignment.End, ui.Alignment.Start, vec2(466, 30):scale(Scale), false, rgbm.from0255(244, 244, 244))
@@ -252,6 +248,10 @@ function LapTimingBlackBox(showArrows)
 
     ui.setCursor(vec2((43 + 139) * Scale, (269 * Scale) + 22))
     ui.dwriteTextAligned(DriverData[CAR.index].incidentCount .. "x", 17 * Scale, ui.Alignment.Start, ui.Alignment.Start, vec2(200, 30):scale(Scale), false, rgbm.from0255(244, 244, 244))
+
+    -- local wall clock (bottom-right)
+    ui.setCursor(vec2(0, (292 * Scale) + 22))
+    ui.dwriteTextAligned(os.date("%H:%M:%S"), 17 * Scale, ui.Alignment.End, ui.Alignment.Start, vec2(466, 24):scale(Scale), false, rgbm.from0255(244, 244, 244))
 
     ui.popDWriteFont()
 end

@@ -117,6 +117,28 @@ function GetEstimatedTimeText(estimatedLaps)
     return string.format("%d:%02d", minutes, seconds)
 end
 
+-- Formats session duration text as MM:SS, switching to HH:MM:SS for 1 hour or longer.
+function FormatSessionDuration(timeMs)
+    if timeMs == nil then
+        return "---"
+    end
+
+    local totalSeconds = math.floor(timeMs / 1000)
+    if totalSeconds < 0 then
+        return "---"
+    end
+
+    local hours = math.floor(totalSeconds / 3600)
+    local minutes = math.floor((totalSeconds % 3600) / 60)
+    local seconds = totalSeconds % 60
+
+    if hours > 0 then
+        return string.format("%02d:%02d:%02d", hours, minutes, seconds)
+    end
+
+    return string.format("%02d:%02d", minutes, seconds)
+end
+
 -- Calculates how much fuel is required to safely reach the session finish.
 function GetFuelToEnd(averageFuelPerLap)
     if averageFuelPerLap <= 0 then
